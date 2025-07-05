@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outfit Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton:wght@400&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #2c2c2c 0%, #000000 100%);
+            min-height: 100vh;
+        }
+        
+        .title-font {
+            font-family: 'Anton', sans-serif;
+            letter-spacing: 2px;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(200, 200, 200, 0.3);
+        }
+        
+        .trend-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #4a4a4a 0%, #2c2c2c 100%);
+            color: white;
+            border: 1px solid #666;
+        }
+        
+        .trend-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #666 0%, #4a4a4a 100%);
+        }
+        
+        .outfit-card {
+            background: linear-gradient(135deg, #333 0%, #000 100%);
+            color: white;
+            transition: all 0.3s ease;
+            border: 1px solid #555;
+        }
+        
+        .outfit-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+        
+        .item-tag {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .bonus-tag {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(135deg, #333 0%, #000 100%);
+            transition: all 0.3s ease;
+            border: 1px solid #555;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, #555 0%, #333 100%);
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="title-font text-5xl md:text-6xl font-bold text-white mb-2">
+                ✨ Outfit Generator
+            </h1>
+            <p class="text-white/80 text-lg">Discover your perfect summer 2025 look</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="glass-card rounded-3xl p-8 mb-8">
+            <!-- Input Section -->
+            <div class="mb-8">
+                <label for="clothes-input" class="block text-lg font-semibold text-gray-700 mb-4">
+                    What's in your closet? 👗
+                </label>
+                <textarea 
+                    id="clothes-input" 
+                    rows="4" 
+                    class="w-full p-4 border-2 border-gray-300 rounded-xl focus:border-gray-600 focus:outline-none transition-colors resize-none text-gray-700"
+                    placeholder="white t-shirt, blue jeans, black blazer, sneakers, lace skirt, crochet top..."
+                ></textarea>
+                <button 
+                    id="generate-btn" 
+                    class="generate-btn w-full mt-4 text-white font-bold py-4 px-6 rounded-xl text-lg"
+                >
+                    ✨ Create My Outfit
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-container" class="space-y-6">
+                <!-- Results will appear here -->
+            </div>
+        </div>
+
+        <!-- Trend Inspiration -->
+        <div class="glass-card rounded-3xl p-8">
+            <h2 class="title-font text-3xl font-bold text-center mb-6 text-gray-800">
+                🌟 Trend Inspiration
+            </h2>
+            <p class="text-center text-gray-600 mb-8 text-lg">
+                Need ideas? Check out these hot summer 2025 trends!
+            </p>
+            <div id="trend-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Trend cards will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fashion trends database
+        const trends = [
+            {
+                name: "Blokette Vibes",
+                emoji: "🏃‍♀️",
+                description: "Athletic meets feminine - the perfect balance!",
+                core_items: ["athletic jersey", "lace skirt", "sneakers"],
+                bonus_items: ["bows", "ribbons", "hair clips"]
+            },
+            {
+                name: "Minimal Chic",
+                emoji: "🤍",
+                description: "Clean lines with artistic flair",
+                core_items: ["bermuda shorts", "tank top"],
+                bonus_items: ["leather belt", "loafers", "asymmetrical top"]
+            },
+            {
+                name: "Modern Boho",
+                emoji: "🌻",
+                description: "Free-spirited with rich textures",
+                core_items: ["crochet top", "wide-leg jeans"],
+                bonus_items: ["clogs", "platform sandals", "fringe jacket"]
+            },
+            {
+                name: "Polished Athleisure",
+                emoji: "💼",
+                description: "Sporty meets sophisticated",
+                core_items: ["blazer", "t-shirt", "track pants"],
+                bonus_items: ["retro sneakers", "baseball cap"]
+            },
+            {
+                name: "Effortless Linen",
+                emoji: "🌊",
+                description: "Embrace the beautiful wrinkles",
+                core_items: ["linen shirt", "linen pants"],
+                bonus_items: ["crinkle dress", "strappy sandals"]
+            },
+            {
+                name: "Coastal Cool",
+                emoji: "⛵",
+                description: "Nautical vibes with modern twist",
+                core_items: ["striped shirt", "white pants", "boat shoes"],
+                bonus_items: ["bucket hat", "seashell jewelry"]
+            }
+        ];
+
+        // DOM elements
+        const generateBtn = document.getElementById('generate-btn');
+        const clothesInput = document.getElementById('clothes-input');
+        const resultsContainer = document.getElementById('results-container');
+        const trendGrid = document.getElementById('trend-grid');
+
+        // Utility functions
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function createTrendCards() {
+            trends.forEach(trend => {
+                const card = document.createElement('div');
+                card.className = 'trend-card rounded-2xl p-6 cursor-pointer';
+                
+                const coreItems = trend.core_items.map(item => 
+                    `<span class="item-tag px-3 py-1 rounded-full text-sm font-medium mr-2 mb-2 inline-block">${capitalize(item)}</span>`
+                ).join('');
+                
+                const bonusItems = trend.bonus_items.map(item => 
+                    `<span class="bonus-tag px-3 py-1 rounded-full text-sm font-medium mr-2 mb-2 inline-block">+${capitalize(item)}</span>`
+                ).join('');
+                
+                card.innerHTML = `
+                    <div class="text-center mb-4">
+                        <div class="text-4xl mb-2">${trend.emoji}</div>
+                        <h3 class="font-bold text-xl mb-2">${trend.name}</h3>
+                        <p class="text-white/80 text-sm">${trend.description}</p>
+                    </div>
+                    <div class="space-y-2">
+                        <div>${coreItems}</div>
+                        ${bonusItems ? `<div>${bonusItems}</div>` : ''}
+                    </div>
+                `;
+                
+                // Add click handler to populate input
+                card.addEventListener('click', () => {
+                    const allItems = [...trend.core_items, ...trend.bonus_items];
+                    clothesInput.value = allItems.join(', ');
+                    clothesInput.focus();
+                });
+                
+                trendGrid.appendChild(card);
+            });
+        }
+
+        function findOutfits() {
+            const userInput = clothesInput.value.toLowerCase().trim();
+            
+            if (!userInput) {
+                showMessage('Please enter some clothes first! 👕', 'warning');
+                return;
+            }
+
+            const userClothes = userInput.split(',').map(item => item.trim()).filter(item => item);
+            const matches = [];
+
+            trends.forEach(trend => {
+                const hasAllCore = trend.core_items.every(coreItem =>
+                    userClothes.some(userItem => 
+                        userItem.includes(coreItem) || coreItem.includes(userItem)
+                    )
+                );
+
+                if (hasAllCore) {
+                    const foundBonuses = trend.bonus_items.filter(bonusItem =>
+                        userClothes.some(userItem => 
+                            userItem.includes(bonusItem) || bonusItem.includes(userItem)
+                        )
+                    );
+
+                    matches.push({
+                        ...trend,
+                        foundBonuses
+                    });
+                }
+            });
+
+            displayResults(matches);
+        }
+
+        function displayResults(matches) {
+            resultsContainer.innerHTML = '';
+            
+            if (matches.length === 0) {
+                showMessage('No perfect matches found, but you can still create amazing outfits! Mix and match what you have - fashion is about creativity! 🎨', 'info');
+                return;
+            }
+
+            const header = document.createElement('h2');
+            header.className = 'text-3xl font-bold text-center mb-8 text-gray-800 animate-fadeIn';
+            header.innerHTML = `🎉 Found ${matches.length} perfect outfit${matches.length > 1 ? 's' : ''}!`;
+            resultsContainer.appendChild(header);
+
+            matches.forEach((match, index) => {
+                const card = document.createElement('div');
+                card.className = 'outfit-card rounded-2xl p-6 animate-fadeIn';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                const coreItems = match.core_items.map(item => 
+                    `<span class="item-tag px-3 py-1 rounded-full text-sm font-medium mr-2 mb-2 inline-block">${capitalize(item)}</span>`
+                ).join('');
+                
+                const bonusItems = match.foundBonuses.map(item => 
+                    `<span class="bonus-tag px-3 py-1 rounded-full text-sm font-medium mr-2 mb-2 inline-block">✨ ${capitalize(item)}</span>`
+                ).join('');
+                
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="font-bold text-2xl mb-2">${match.emoji} ${match.name}</h3>
+                            <p class="text-white/90">${match.description}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <h4 class="font-semibold mb-2">Your Perfect Combo:</h4>
+                            ${coreItems}
+                        </div>
+                        ${bonusItems ? `
+                            <div>
+                                <h4 class="font-semibold mb-2">Bonus Style Points:</h4>
+                                ${bonusItems}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        function showMessage(text, type) {
+            const colors = {
+                warning: 'bg-yellow-100 border-yellow-300 text-yellow-800',
+                info: 'bg-blue-100 border-blue-300 text-blue-800',
+                success: 'bg-green-100 border-green-300 text-green-800'
+            };
+            
+            resultsContainer.innerHTML = `
+                <div class="animate-fadeIn p-6 rounded-2xl border-2 ${colors[type]} text-center">
+                    <p class="text-lg font-medium">${text}</p>
+                </div>
+            `;
+        }
+
+        // Event listeners
+        generateBtn.addEventListener('click', findOutfits);
+        clothesInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                findOutfits();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createTrendCards();
+            // Add some sample text to help users get started
+            clothesInput.value = "white t-shirt, blue jeans, sneakers, blazer";
+        });
+    </script>
+</body>
+</html>
